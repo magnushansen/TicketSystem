@@ -15,7 +15,6 @@ public class UsersController : Controller
         _context = context;
     }
 
-    // GET: Users
     public async Task<IActionResult> Index(int userPage = 1)
     {
         var users = _context.Users.AsQueryable();
@@ -39,7 +38,6 @@ public class UsersController : Controller
         return View(viewModel);
     }
 
-    // GET: Users/Details/5
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null)
@@ -60,13 +58,11 @@ public class UsersController : Controller
         return View(user);
     }
 
-    // GET: Users/Create
     public IActionResult Create()
     {
         return View();
     }
 
-    // POST: Users/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("UserId,Username,Email,FullName")] User user)
@@ -80,7 +76,6 @@ public class UsersController : Controller
         return View(user);
     }
 
-    // GET: Users/Edit/5
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -96,7 +91,6 @@ public class UsersController : Controller
         return View(user);
     }
 
-    // POST: Users/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, [Bind("UserId,Username,Email,FullName")] User user)
@@ -129,7 +123,6 @@ public class UsersController : Controller
         return View(user);
     }
 
-    // GET: Users/Delete/5
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -147,7 +140,6 @@ public class UsersController : Controller
         return View(user);
     }
 
-    // POST: Users/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)

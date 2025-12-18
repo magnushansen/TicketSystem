@@ -17,7 +17,6 @@ public static class SeedData
                 return;
             }
 
-            // Create users
             User u1 = new User { Username = "jdoe", Email = "jdoe@example.com", FullName = "John Doe" };
             User u2 = new User { Username = "asmith", Email = "asmith@example.com", FullName = "Alice Smith" };
             User u3 = new User { Username = "bjones", Email = "bjones@example.com", FullName = "Bob Jones" };
@@ -26,7 +25,6 @@ public static class SeedData
 
             context.Users.AddRange(u1, u2, u3, u4, u5);
 
-            // Create tickets
             Ticket t1 = new Ticket
             {
                 Title = "Fix login page bug",
@@ -90,7 +88,6 @@ public static class SeedData
             context.Tickets.AddRange(t1, t2, t3, t4, t5, t6);
             context.SaveChanges();
 
-            // Create ticket-user assignments
             context.TicketUsers.AddRange(
                 new TicketUser { Ticket = t1, User = u1, AssignedDate = DateTime.Parse("2025-01-15") },
                 new TicketUser { Ticket = t1, User = u2, AssignedDate = DateTime.Parse("2025-01-16") },

@@ -99,7 +99,6 @@ public class HomeController : Controller
             context.Tickets.Add(ticket);
             await context.SaveChangesAsync();
 
-            // Add user assignments
             if (selectedUserIds != null && selectedUserIds.Any())
             {
                 foreach (var userId in selectedUserIds)
@@ -144,11 +143,9 @@ public class HomeController : Controller
         {
             context.Tickets.Update(ticket);
 
-            // Remove existing assignments
             var existingAssignments = context.TicketUsers.Where(tu => tu.TicketId == ticket.TicketId);
             context.TicketUsers.RemoveRange(existingAssignments);
 
-            // Add new assignments
             if (selectedUserIds != null && selectedUserIds.Any())
             {
                 foreach (var userId in selectedUserIds)
@@ -195,7 +192,6 @@ public class HomeController : Controller
     [HttpPost]
     public async Task<IActionResult> Delete(Ticket ticket)
     {
-        // Remove ticket-user assignments first
         var assignments = context.TicketUsers.Where(tu => tu.TicketId == ticket.TicketId);
         context.TicketUsers.RemoveRange(assignments);
 
