@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AlbumRegister.Models;
 
-public class AlbumGenreViewModel
+public class TicketListViewModel
 {
-    public List<Album>? Albums { get; set; }
-    public SelectList? Genres { get; set; }
-    public string? AlbumGenre { get; set; }
+    public List<Ticket>? Tickets { get; set; }
+    public SelectList? Statuses { get; set; }
+    public SelectList? Priorities { get; set; }
+    public string? FilterStatus { get; set; }
+    public string? FilterPriority { get; set; }
     public string? SearchString { get; set; }
 
     public PagingInfo PagingInfo { get; set; } = new();

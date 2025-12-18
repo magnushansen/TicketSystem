@@ -1,0 +1,87 @@
+@model AlbumRegister.Models.TicketListViewModel
+
+@{
+    ViewData["Title"] = "Tickets";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Tickets</h2>
+    <a asp-action="Create" class="btn btn-primary">Create New Ticket</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form asp-controller="Home" asp-action="Ticket" method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select asp-for="FilterStatus" asp-items="Model.Statuses" class="form-select">
+                    <option value="">All Statuses</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Priority</label>
+                <select asp-for="FilterPriority" asp-items="Model.Priorities" class="form-select">
+                    <option value="">All Priorities</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Search Title</label>
+                <input type="text" asp-for="SearchString" class="form-control" placeholder="Enter ticket title..." />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-secondary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Created Date</th>
+            <th>Assigned Users</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Ticket t in Model.Tickets ?? new List<Ticket>()) {
+            <tr>
+                <td>@t.TicketId</td>
+                <td>@t.Title</td>
+                <td>@t.Status</td>
+                <td>@t.Priority</td>
+                <td>@t.CreatedDate.ToShortDateString()</td>
+                <td>
+                    @string.Join(", ", t.TicketUsers.Select(tu => tu.User?.Username ?? ""))
+                </td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@t.TicketId"
+                       class="btn btn-sm btn-outline-secondary">
+                        View
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@t.TicketId"
+                       class="btn btn-sm btn-outline-secondary">
+                        Edit
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@t.TicketId"
+                       class="btn btn-sm btn-outline-danger">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="pagination-container">
+    <div page-model="@Model.PagingInfo" page-action="Ticket"
+    page-classes-enabled="true" page-class="btn"
+    page-class-normal="btn-outline-secondary"
+    page-class-selected="btn-dark" class="btn-group">
+    </div>
+</div>

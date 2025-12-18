@@ -4,19 +4,19 @@ using AlbumRegister.Data;
 
 namespace AlbumRegister.Components;
 
-public class AlbumFeatured : ViewComponent
+public class TicketFeatured : ViewComponent
 {
-    private AlbumContext context;
+    private TicketContext context;
 
-    public AlbumFeatured(AlbumContext ctx)
+    public TicketFeatured(TicketContext ctx)
     {
         context = ctx;
     }
 
     public IViewComponentResult Invoke()
     {
-        var Albums = (IEnumerable<Album>)context.Albums;
-        Album? a = Albums.OrderBy(x => Guid.NewGuid()).FirstOrDefault();
-        return View("/Views/Shared/_AlbumSummary.cshtml", a);
+        var Tickets = (IEnumerable<Ticket>)context.Tickets;
+        Ticket? t = Tickets.OrderBy(x => Guid.NewGuid()).FirstOrDefault();
+        return View("/Views/Shared/_TicketSummary.cshtml", t);
     }
 }

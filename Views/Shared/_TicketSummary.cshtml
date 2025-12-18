@@ -1,0 +1,11 @@
+@model AlbumRegister.Models.Ticket
+
+<h2 style="text-align: center; margin-top: 8rem;">Featured Ticket</h2>
+<div class="card mx-auto" style="max-width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">@Model.Title</h5>
+    <h6 class="card-subtitle mb-2 text-muted">@Model.Status - @Model.Priority Priority</h6>
+    <p class="card-text">Created: @Model.CreatedDate.ToShortDateString()</p>
+    <a asp-controller="Home" asp-action="Details" asp-route-id="@Model.TicketId" class="card-link">Details</a>
+  </div>
+</div>

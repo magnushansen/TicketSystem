@@ -1,0 +1,45 @@
+@model AlbumRegister.Models.UserListViewModel
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Users</h2>
+    <a asp-action="Create" class="btn btn-primary">Create New User</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Full Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Users ?? new List<User>()) {
+        <tr>
+            <td>@item.UserId</td>
+            <td>@item.Username</td>
+            <td>@item.Email</td>
+            <td>@item.FullName</td>
+            <td class="text-end">
+                <a asp-action="Details" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-secondary">View</a>
+                <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <a asp-action="Delete" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-danger">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<div class="pagination-container">
+    <div page-model="@Model.PagingInfo" page-action="Index"
+    page-classes-enabled="true" page-class="btn"
+    page-class-normal="btn-outline-secondary"
+    page-class-selected="btn-dark" page-url-values='new Dictionary<string, object> { { "userPage", "" } }' class="btn-group">
+    </div>
+</div>

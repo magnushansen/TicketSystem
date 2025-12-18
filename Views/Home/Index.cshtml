@@ -1,10 +1,183 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model AlbumRegister.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <description bg-color="info">This is an album library application. Browse and manage your favorite albums.</description>
+<h2>Dashboard</h2>
+<p class="text-muted">Overview of your ticket management system</p>
+
+<div class="row mt-4">
+    <!-- Statistics Cards -->
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Total Tickets</h6>
+                <h2 class="card-title mb-0">@Model.TotalTickets</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Open</h6>
+                <h2 class="card-title mb-0">@Model.OpenTickets</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">In Progress</h6>
+                <h2 class="card-title mb-0">@Model.InProgressTickets</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Completed</h6>
+                <h2 class="card-title mb-0">@Model.CompletedTickets</h2>
+            </div>
+        </div>
+    </div>
 </div>
 
-@await Component.InvokeAsync("AlbumFeatured");
+<div class="row mt-2">
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Total Users</h6>
+                <h2 class="card-title mb-0">@Model.TotalUsers</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Critical Priority</h6>
+                <h2 class="card-title mb-0 text-danger">@Model.CriticalPriorityTickets</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">High Priority</h6>
+                <h2 class="card-title mb-0 text-warning">@Model.HighPriorityTickets</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Closed</h6>
+                <h2 class="card-title mb-0">@Model.ClosedTickets</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Tickets and Upcoming Due Tickets -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Recent Tickets</h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.RecentTickets.Any())
+                {
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ticket in Model.RecentTickets)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-controller="Home" asp-action="Details" asp-route-id="@ticket.TicketId">
+                                            @ticket.Title
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">@ticket.Status</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge @(ticket.Priority == "Critical" ? "bg-danger" : ticket.Priority == "High" ? "bg-warning" : "bg-info")">
+                                            @ticket.Priority
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted p-3">No tickets found.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Upcoming Due Tickets</h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.UpcomingDueTickets.Any())
+                {
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Due Date</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ticket in Model.UpcomingDueTickets)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-controller="Home" asp-action="Details" asp-route-id="@ticket.TicketId">
+                                            @ticket.Title
+                                        </a>
+                                    </td>
+                                    <td>@ticket.DueDate?.ToShortDateString()</td>
+                                    <td>
+                                        <span class="badge @(ticket.Priority == "Critical" ? "bg-danger" : ticket.Priority == "High" ? "bg-warning" : "bg-info")">
+                                            @ticket.Priority
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted p-3">No upcoming due tickets.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-controller="Home" asp-action="Ticket" class="btn btn-primary">View All Tickets</a>
+    <a asp-controller="Home" asp-action="Create" class="btn btn-success">Create New Ticket</a>
+</div>

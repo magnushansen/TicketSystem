@@ -2,49 +2,53 @@ namespace AlbumRegister.Models
 {
     public static class ViewModelFactory
     {
-        public static AlbumViewModel Details(Album p)
+        public static TicketViewModel Details(Ticket t, IEnumerable<User> assignedUsers)
         {
-            return new AlbumViewModel
+            return new TicketViewModel
             {
-                Album = p,
+                Ticket = t,
                 Action = "Details",
                 ReadOnly = true,
                 Theme = "info",
                 ShowAction = false,
-                Genres = p == null || p.Genre == null
-            ? Enumerable.Empty<Genre>()
-            : new List<Genre> { p.Genre },
+                AssignedUsers = assignedUsers,
+                Users = Enumerable.Empty<User>()
             };
         }
 
-        public static AlbumViewModel Create(Album album, IEnumerable<Genre> genres)
+        public static TicketViewModel Create(Ticket ticket, IEnumerable<User> users)
         {
-            return new AlbumViewModel
+            return new TicketViewModel
             {
-                Album = album,
-                Genres = genres
+                Ticket = ticket,
+                Users = users,
+                AssignedUsers = Enumerable.Empty<User>()
             };
         }
 
-
-        public static AlbumViewModel Edit(Album album,
-            IEnumerable<Genre> genres)
+        public static TicketViewModel Edit(Ticket ticket, IEnumerable<User> users, IEnumerable<User> assignedUsers, List<int> selectedUserIds)
         {
-            return new AlbumViewModel
+            return new TicketViewModel
             {
-                Album = album,
-                Genres = genres,
+                Ticket = ticket,
+                Users = users,
+                AssignedUsers = assignedUsers,
+                SelectedUserIds = selectedUserIds,
                 Theme = "warning",
                 Action = "Edit"
             };
         }
 
-        public static AlbumViewModel Delete(Album p,
-            IEnumerable<Genre> genres) {
-            return new AlbumViewModel {
-                Album = p, Action = "Delete",
-                ReadOnly = true, Theme = "danger",
-                Genres = genres
+        public static TicketViewModel Delete(Ticket t, IEnumerable<User> assignedUsers)
+        {
+            return new TicketViewModel
+            {
+                Ticket = t,
+                Action = "Delete",
+                ReadOnly = true,
+                Theme = "danger",
+                AssignedUsers = assignedUsers,
+                Users = Enumerable.Empty<User>()
             };
         }
     }

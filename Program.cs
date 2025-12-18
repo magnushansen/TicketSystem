@@ -3,8 +3,8 @@ using AlbumRegister.Data;
 using AlbumRegister.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<AlbumContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("AlbumContext") ?? throw new InvalidOperationException("Connection string 'AlbumContext' not found.")));
+builder.Services.AddDbContext<TicketContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("TicketContext") ?? throw new InvalidOperationException("Connection string 'TicketContext' not found.")));
 
 builder.Services.AddControllersWithViews();
 

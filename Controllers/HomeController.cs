@@ -10,141 +10,227 @@ namespace AlbumRegister.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private AlbumContext context;
-    private IEnumerable<Genre> genres => context.Genres;
+    private TicketContext context;
+    private IEnumerable<User> users => context.Users;
     public int PageSize = 10;
 
-    public HomeController(ILogger<HomeController> logger, AlbumContext data)
+    public HomeController(ILogger<HomeController> logger, TicketContext data)
     {
         _logger = logger;
         context = data;
     }
 
-    public IActionResult Album(string albumGenre, string searchString, int albumPage = 1)
+    public IActionResult Ticket(string filterStatus, string filterPriority, string searchString, int ticketPage = 1)
     {
-        var albums = context.Albums.Include(a => a.Genre).AsQueryable();
+        var tickets = context.Tickets.Include(t => t.TicketUsers).ThenInclude(tu => tu.User).AsQueryable();
 
         if (!string.IsNullOrEmpty(searchString))
         {
-            albums = albums.Where(s => s.Title!.ToUpper().Contains(searchString.ToUpper()));
+            tickets = tickets.Where(s => s.Title!.ToUpper().Contains(searchString.ToUpper()));
         }
 
-        if (!string.IsNullOrEmpty(albumGenre))
+        if (!string.IsNullOrEmpty(filterStatus))
         {
-            albums = albums.Where(x => x.Genre!.GenreName == albumGenre);
+            tickets = tickets.Where(x => x.Status == filterStatus);
         }
 
-        albums = albums.Where(a => a.IsShown);
-
-        var totalItems = albums.Count();
-
-        var albumGenreVM = new AlbumGenreViewModel
+        if (!string.IsNullOrEmpty(filterPriority))
         {
-            Genres = new SelectList(genres, "GenreName", "GenreName"),
-            Albums = albums
-                .OrderBy(p => p.AlbumId)
-                .Skip((albumPage - 1) * PageSize)
+            tickets = tickets.Where(x => x.Priority == filterPriority);
+        }
+
+        var totalItems = tickets.Count();
+
+        var statuses = new List<string> { "Open", "In Progress", "Completed", "Closed" };
+        var priorities = new List<string> { "Low", "Medium", "High", "Critical" };
+
+        var ticketListVM = new TicketListViewModel
+        {
+            Statuses = new SelectList(statuses),
+            Priorities = new SelectList(priorities),
+            Tickets = tickets
+                .OrderByDescending(t => t.CreatedDate)
+                .Skip((ticketPage - 1) * PageSize)
                 .Take(PageSize)
                 .ToList(),
-            AlbumGenre = albumGenre,
+            FilterStatus = filterStatus,
+            FilterPriority = filterPriority,
             SearchString = searchString,
             PagingInfo = new PagingInfo
             {
-                CurrentPage = albumPage,
+                CurrentPage = ticketPage,
                 ItemsPerPage = PageSize,
                 TotalItems = totalItems
             }
         };
 
-        return View(albumGenreVM);
+        return View(ticketListVM);
     }
-
-
 
     public async Task<IActionResult> Details(int id)
     {
-        Album? a = await context.Albums
-            .Include(c => c.Genre)
-            .FirstOrDefaultAsync(m => m.AlbumId == id)
-            ?? new() { Title = string.Empty };
-        AlbumViewModel model = ViewModelFactory.Details(a);
-        return View("AlbumEditor", model);
+        Ticket? t = await context.Tickets
+            .Include(t => t.TicketUsers)
+            .ThenInclude(tu => tu.User)
+            .FirstOrDefaultAsync(m => m.TicketId == id);
+
+        if (t == null)
+        {
+            return NotFound();
+        }
+
+        var assignedUsers = t.TicketUsers.Select(tu => tu.User!).ToList();
+        TicketViewModel model = ViewModelFactory.Details(t, assignedUsers);
+        return View("TicketEditor", model);
     }
-
-
 
     public IActionResult Create()
     {
-        return View("AlbumEditor",
-            ViewModelFactory.Create(new() { Title = string.Empty }, genres));
+        return View("TicketEditor",
+            ViewModelFactory.Create(new() { Title = string.Empty }, users));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(
-    [FromForm] Album album)
+    public async Task<IActionResult> Create([FromForm] Ticket ticket, [FromForm] List<int> selectedUserIds)
     {
         if (ModelState.IsValid)
         {
-            album.AlbumId = default;
-            album.Genre = default;
-            context.Albums.Add(album);
+            ticket.TicketId = default;
+            context.Tickets.Add(ticket);
             await context.SaveChangesAsync();
-            return RedirectToAction(nameof(Album));
+
+            // Add user assignments
+            if (selectedUserIds != null && selectedUserIds.Any())
+            {
+                foreach (var userId in selectedUserIds)
+                {
+                    context.TicketUsers.Add(new TicketUser
+                    {
+                        TicketId = ticket.TicketId,
+                        UserId = userId,
+                        AssignedDate = DateTime.Now
+                    });
+                }
+                await context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Ticket));
         }
-        return View("AlbumEditor",
-            ViewModelFactory.Create(album, genres));
+        return View("TicketEditor",
+            ViewModelFactory.Create(ticket, users));
     }
 
+    public async Task<IActionResult> Edit(int id)
+    {
+        Ticket? t = await context.Tickets
+            .Include(t => t.TicketUsers)
+            .ThenInclude(tu => tu.User)
+            .FirstOrDefaultAsync(t => t.TicketId == id);
 
-    public async Task<IActionResult> Edit(int id) {
-        Album? p = await context.Albums.FindAsync(id);
-        if (p != null) {
-            AlbumViewModel model =
-            ViewModelFactory.Edit(p, genres);
-            return View("AlbumEditor", model);
+        if (t != null)
+        {
+            var assignedUsers = t.TicketUsers.Select(tu => tu.User!).ToList();
+            var selectedUserIds = t.TicketUsers.Select(tu => tu.UserId).ToList();
+            TicketViewModel model = ViewModelFactory.Edit(t, users, assignedUsers, selectedUserIds);
+            return View("TicketEditor", model);
         }
         return NotFound();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(
-            [FromForm] Album album) {
-        if (ModelState.IsValid) {
-            album.Genre = default;
-            context.Albums.Update(album);
+    public async Task<IActionResult> Edit([FromForm] Ticket ticket, [FromForm] List<int> selectedUserIds)
+    {
+        if (ModelState.IsValid)
+        {
+            context.Tickets.Update(ticket);
+
+            // Remove existing assignments
+            var existingAssignments = context.TicketUsers.Where(tu => tu.TicketId == ticket.TicketId);
+            context.TicketUsers.RemoveRange(existingAssignments);
+
+            // Add new assignments
+            if (selectedUserIds != null && selectedUserIds.Any())
+            {
+                foreach (var userId in selectedUserIds)
+                {
+                    context.TicketUsers.Add(new TicketUser
+                    {
+                        TicketId = ticket.TicketId,
+                        UserId = userId,
+                        AssignedDate = DateTime.Now
+                    });
+                }
+            }
+
             await context.SaveChangesAsync();
-            return RedirectToAction(nameof(Album));
+            return RedirectToAction(nameof(Ticket));
         }
-        return View("AlbumEditor",
-            ViewModelFactory.Edit(album, genres));
+
+        var t = await context.Tickets
+            .Include(t => t.TicketUsers)
+            .ThenInclude(tu => tu.User)
+            .FirstOrDefaultAsync(t => t.TicketId == ticket.TicketId);
+
+        var assignedUsers = t?.TicketUsers.Select(tu => tu.User!).ToList() ?? new List<User>();
+        return View("TicketEditor",
+            ViewModelFactory.Edit(ticket, users, assignedUsers, selectedUserIds ?? new List<int>()));
     }
 
+    public async Task<IActionResult> Delete(int id)
+    {
+        Ticket? t = await context.Tickets
+            .Include(t => t.TicketUsers)
+            .ThenInclude(tu => tu.User)
+            .FirstOrDefaultAsync(t => t.TicketId == id);
 
-    public async Task<IActionResult> Delete(int id) {
-        Album? p = await context.Albums.FindAsync(id);
-        if (p != null) {
-            AlbumViewModel model = ViewModelFactory.Delete(
-                p, genres);
-            return View("AlbumEditor", model);
+        if (t != null)
+        {
+            var assignedUsers = t.TicketUsers.Select(tu => tu.User!).ToList();
+            TicketViewModel model = ViewModelFactory.Delete(t, assignedUsers);
+            return View("TicketEditor", model);
         }
         return NotFound();
-        }
+    }
 
     [HttpPost]
-    public async Task<IActionResult> Delete(Album album) {
-        context.Albums.Remove(album);
+    public async Task<IActionResult> Delete(Ticket ticket)
+    {
+        // Remove ticket-user assignments first
+        var assignments = context.TicketUsers.Where(tu => tu.TicketId == ticket.TicketId);
+        context.TicketUsers.RemoveRange(assignments);
+
+        context.Tickets.Remove(ticket);
         await context.SaveChangesAsync();
-        return RedirectToAction(nameof(Album));
-        }
-
+        return RedirectToAction(nameof(Ticket));
+    }
 
     public async Task<IActionResult> Index()
     {
-        var albums = await context.Albums.ToListAsync();
-        var viewModel = new AlbumGenreViewModel
+        var tickets = await context.Tickets
+            .Include(t => t.TicketUsers)
+            .ThenInclude(tu => tu.User)
+            .ToListAsync();
+
+        var totalUsers = await context.Users.CountAsync();
+
+        var viewModel = new DashboardViewModel
         {
-            Albums = albums
+            TotalTickets = tickets.Count,
+            OpenTickets = tickets.Count(t => t.Status == "Open"),
+            InProgressTickets = tickets.Count(t => t.Status == "In Progress"),
+            CompletedTickets = tickets.Count(t => t.Status == "Completed"),
+            ClosedTickets = tickets.Count(t => t.Status == "Closed"),
+            TotalUsers = totalUsers,
+            CriticalPriorityTickets = tickets.Count(t => t.Priority == "Critical"),
+            HighPriorityTickets = tickets.Count(t => t.Priority == "High"),
+            RecentTickets = tickets.OrderByDescending(t => t.CreatedDate).Take(5).ToList(),
+            UpcomingDueTickets = tickets
+                .Where(t => t.DueDate.HasValue && t.DueDate.Value >= DateTime.Today && t.Status != "Completed" && t.Status != "Closed")
+                .OrderBy(t => t.DueDate)
+                .Take(5)
+                .ToList()
         };
+
         return View(viewModel);
     }
 

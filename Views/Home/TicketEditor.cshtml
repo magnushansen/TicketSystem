@@ -1,0 +1,108 @@
+@model TicketViewModel
+@{
+    Layout = "_Layout";
+}
+
+<h2 class="mb-4">@Model?.Action Ticket</h2>
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="@Model?.Action" method="post">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Ticket.TicketId" class="form-label"></label>
+                    <input class="form-control" asp-for="Ticket.TicketId" readonly />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Ticket.Title" class="form-label"></label>
+                    <input class="form-control" asp-for="Ticket.Title" readonly="@Model?.ReadOnly" />
+                    <span asp-validation-for="Ticket.Title" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Ticket.Description" class="form-label"></label>
+                <textarea class="form-control" asp-for="Ticket.Description" readonly="@Model?.ReadOnly" rows="4"></textarea>
+                <span asp-validation-for="Ticket.Description" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Ticket.Status" class="form-label"></label>
+                    <select asp-for="Ticket.Status" class="form-select" disabled="@Model?.ReadOnly">
+                        <option value="">Choose Status</option>
+                        <option value="Open">Open</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                    <span asp-validation-for="Ticket.Status" class="text-danger"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Ticket.Priority" class="form-label"></label>
+                    <select asp-for="Ticket.Priority" class="form-select" disabled="@Model?.ReadOnly">
+                        <option value="">Choose Priority</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                    <span asp-validation-for="Ticket.Priority" class="text-danger"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Ticket.CreatedDate" class="form-label"></label>
+                    <input class="form-control" asp-for="Ticket.CreatedDate" type="date" readonly="@Model?.ReadOnly" />
+                    <span asp-validation-for="Ticket.CreatedDate" class="text-danger"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Ticket.DueDate" class="form-label"></label>
+                    <input class="form-control" asp-for="Ticket.DueDate" type="date" readonly="@Model?.ReadOnly" />
+                    <span asp-validation-for="Ticket.DueDate" class="text-danger"></span>
+                </div>
+            </div>
+
+            @if (!Model?.ReadOnly ?? false) {
+                <div class="mb-3">
+                    <label class="form-label">Assign Users</label>
+                    <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                        @foreach (var user in Model?.Users ?? Enumerable.Empty<User>()) {
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox"
+                                       name="selectedUserIds" value="@user.UserId"
+                                       id="user_@user.UserId"
+                                       @(Model?.SelectedUserIds?.Contains(user.UserId) == true ? "checked" : "") />
+                                <label class="form-check-label" for="user_@user.UserId">
+                                    @user.Username (@user.FullName)
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            } else {
+                <div class="mb-3">
+                    <label class="form-label">Assigned Users</label>
+                    <div class="border rounded p-3">
+                        @if (Model?.AssignedUsers?.Any() == true) {
+                            <ul class="mb-0">
+                                @foreach (var user in Model.AssignedUsers) {
+                                    <li>@user.Username (@user.FullName)</li>
+                                }
+                            </ul>
+                        } else {
+                            <p class="text-muted mb-0">No users assigned</p>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="mt-4">
+                @if (Model?.ShowAction == true) {
+                    <button class="btn btn-primary" type="submit">
+                        @Model?.Action
+                    </button>
+                }
+                <a class="btn btn-outline-secondary" asp-action="Ticket">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>

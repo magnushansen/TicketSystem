@@ -8,145 +8,102 @@ public static class SeedData
 {
     public static void Initialize(IServiceProvider serviceProvider)
     {
-        using (var context = new AlbumContext(
+        using (var context = new TicketContext(
             serviceProvider.GetRequiredService<
-                DbContextOptions<AlbumContext>>()))
+                DbContextOptions<TicketContext>>()))
         {
-            if (context.Albums.Any() || context.Genres.Any())
+            if (context.Tickets.Any() || context.Users.Any())
             {
-                return;   
+                return;
             }
 
-            Genre g1 = new Genre { GenreName = "Pop" };
-            Genre g2 = new Genre { GenreName = "Rock" };
-            Genre g3 = new Genre { GenreName = "Hip Hop" };
-            Genre g4 = new Genre { GenreName = "Country" };
-            Genre g5 = new Genre { GenreName = "Soul" };
+            // Create users
+            User u1 = new User { Username = "jdoe", Email = "jdoe@example.com", FullName = "John Doe" };
+            User u2 = new User { Username = "asmith", Email = "asmith@example.com", FullName = "Alice Smith" };
+            User u3 = new User { Username = "bjones", Email = "bjones@example.com", FullName = "Bob Jones" };
+            User u4 = new User { Username = "cwhite", Email = "cwhite@example.com", FullName = "Carol White" };
+            User u5 = new User { Username = "dbrowndev", Email = "dbrown@example.com", FullName = "David Brown" };
 
-            context.Albums.AddRange(
-                new Album
-                {
-                    Title = "When We All Fall Asleep, Where Do We Go?",
-                    ReleaseDate = DateTime.Parse("2019-03-29"),
-                    Artist = "Billie Eilish",
-                    Group = "Billie Eilish",
-                    Genre = g1
-                },
-                new Album
-                {
-                    Title = "Happier Than Ever",
-                    ReleaseDate = DateTime.Parse("2021-07-30"),
-                    Artist = "Billie Eilish",
-                    Group = "Billie Eilish",
-                    Genre = g1,
-                    IsShown = false
-                },
-                new Album
-                {
-                    Title = "25",
-                    ReleaseDate = DateTime.Parse("2015-11-20"),
-                    Artist = "Adele",
-                    Group = "Adele",
-                    Genre = g1
-                },
-                new Album
-                {
-                    Title = "Abbey Road",
-                    ReleaseDate = DateTime.Parse("1969-09-26"),
-                    Artist = "The Beatles",
-                    Group = "The Beatles",
-                    Genre = g2
-                },
-                new Album
-                {
-                    Title = "The Dark Side of the Moon",
-                    ReleaseDate = DateTime.Parse("1973-03-01"),
-                    Artist = "Pink Floyd",
-                    Group = "Pink Floyd",
-                    Genre = g2
-                },
-                new Album
-                {
-                    Title = "To Pimp a Butterfly",
-                    ReleaseDate = DateTime.Parse("2015-03-15"),
-                    Artist = "Kendrick Lamar",
-                    Group = "Kendrick Lamar",
-                    Genre = g3
-                },
-                new Album
-                {
-                    Title = "Good Kid, M.A.A.D City",
-                    ReleaseDate = DateTime.Parse("2012-10-22"),
-                    Artist = "Kendrick Lamar",
-                    Group = "Kendrick Lamar",
-                    Genre = g3
-                },
-                new Album
-                {
-                    Title = "1989",
-                    ReleaseDate = DateTime.Parse("2014-10-27"),
-                    Artist = "Taylor Swift",
-                    Group = "Taylor Swift",
-                    Genre = g4
-                },
-                new Album
-                {
-                    Title = "Fearless",
-                    ReleaseDate = DateTime.Parse("2008-11-11"),
-                    Artist = "Taylor Swift",
-                    Group = "Taylor Swift",
-                    Genre = g4
-                },
-                new Album
-                {
-                    Title = "Lover",
-                    ReleaseDate = DateTime.Parse("2019-08-23"),
-                    Artist = "Taylor Swift",
-                    Group = "Taylor Swift",
-                    Genre = g1
-                },
-                new Album
-                {
-                    Title = "Back to Black",
-                    ReleaseDate = DateTime.Parse("2006-10-27"),
-                    Artist = "Amy Winehouse",
-                    Group = "Amy Winehouse",
-                    Genre = g5
-                },
-                new Album
-                {
-                    Title = "Frank",
-                    ReleaseDate = DateTime.Parse("2003-10-20"),
-                    Artist = "Amy Winehouse",
-                    Group = "Amy Winehouse",
-                    Genre = g5
-                },
-                new Album
-                {
-                    Title = "Channel Orange",
-                    ReleaseDate = DateTime.Parse("2012-07-10"),
-                    Artist = "Frank Ocean",
-                    Group = "Frank Ocean",
-                    Genre = g5
-                }, 
-                new Album
-                {
-                    Title = "Blonde",
-                    ReleaseDate = DateTime.Parse("2016-08-20"),
-                    Artist = "Frank Ocean",
-                    Group = "Frank Ocean",
-                    Genre = g5
-                },
-                new Album
-                {
-                    Title = "Currents",
-                    ReleaseDate = DateTime.Parse("2015-07-17"),
-                    Artist = "Tame Impala",
-                    Group = "Tame Impala",
-                    Genre = g2
-                }
-                
+            context.Users.AddRange(u1, u2, u3, u4, u5);
+
+            // Create tickets
+            Ticket t1 = new Ticket
+            {
+                Title = "Fix login page bug",
+                Description = "Users are unable to log in when using special characters in password",
+                Status = "In Progress",
+                Priority = "High",
+                CreatedDate = DateTime.Parse("2025-01-15"),
+                DueDate = DateTime.Parse("2025-01-25")
+            };
+
+            Ticket t2 = new Ticket
+            {
+                Title = "Add dark mode support",
+                Description = "Implement dark mode theme throughout the application",
+                Status = "Open",
+                Priority = "Medium",
+                CreatedDate = DateTime.Parse("2025-01-18"),
+                DueDate = DateTime.Parse("2025-02-15")
+            };
+
+            Ticket t3 = new Ticket
+            {
+                Title = "Database performance optimization",
+                Description = "Optimize slow queries in the reporting module",
+                Status = "Open",
+                Priority = "Critical",
+                CreatedDate = DateTime.Parse("2025-01-20"),
+                DueDate = DateTime.Parse("2025-01-30")
+            };
+
+            Ticket t4 = new Ticket
+            {
+                Title = "Update user documentation",
+                Description = "Refresh the user manual with new features from v2.0",
+                Status = "Completed",
+                Priority = "Low",
+                CreatedDate = DateTime.Parse("2025-01-10"),
+                DueDate = DateTime.Parse("2025-01-20")
+            };
+
+            Ticket t5 = new Ticket
+            {
+                Title = "Implement export to PDF feature",
+                Description = "Add ability to export reports as PDF files",
+                Status = "In Progress",
+                Priority = "Medium",
+                CreatedDate = DateTime.Parse("2025-01-16"),
+                DueDate = DateTime.Parse("2025-02-05")
+            };
+
+            Ticket t6 = new Ticket
+            {
+                Title = "Security audit of authentication module",
+                Description = "Conduct comprehensive security review and fix vulnerabilities",
+                Status = "Open",
+                Priority = "Critical",
+                CreatedDate = DateTime.Parse("2025-01-22"),
+                DueDate = DateTime.Parse("2025-02-01")
+            };
+
+            context.Tickets.AddRange(t1, t2, t3, t4, t5, t6);
+            context.SaveChanges();
+
+            // Create ticket-user assignments
+            context.TicketUsers.AddRange(
+                new TicketUser { Ticket = t1, User = u1, AssignedDate = DateTime.Parse("2025-01-15") },
+                new TicketUser { Ticket = t1, User = u2, AssignedDate = DateTime.Parse("2025-01-16") },
+                new TicketUser { Ticket = t2, User = u3, AssignedDate = DateTime.Parse("2025-01-18") },
+                new TicketUser { Ticket = t3, User = u2, AssignedDate = DateTime.Parse("2025-01-20") },
+                new TicketUser { Ticket = t3, User = u5, AssignedDate = DateTime.Parse("2025-01-20") },
+                new TicketUser { Ticket = t4, User = u4, AssignedDate = DateTime.Parse("2025-01-10") },
+                new TicketUser { Ticket = t5, User = u1, AssignedDate = DateTime.Parse("2025-01-16") },
+                new TicketUser { Ticket = t5, User = u3, AssignedDate = DateTime.Parse("2025-01-17") },
+                new TicketUser { Ticket = t6, User = u2, AssignedDate = DateTime.Parse("2025-01-22") },
+                new TicketUser { Ticket = t6, User = u5, AssignedDate = DateTime.Parse("2025-01-22") }
             );
+
             context.SaveChanges();
         }
     }
