@@ -1,6 +1,6 @@
-# Album Register
+# Ticket Management System
 
-ASP.NET Core 9.0 MVC web application for managing an album collection.
+ASP.NET Core 9.0 MVC web application for managing tickets and user assignments.
 
 ## Prerequisites
 
@@ -8,23 +8,24 @@ ASP.NET Core 9.0 MVC web application for managing an album collection.
 
 ## Running the Application
 
-1. Create the database:
-   ```bash
-   dotnet ef database update
-   ```
-
-2. Run the application:
+1. Run the application:
    ```bash
    dotnet run
    ```
 
-3. Open your browser and navigate to `https://localhost:7039` or `http://localhost:5267`
+2. Open your browser and navigate to `https://localhost:7039` or `http://localhost:5267`
 
-The database will be seeded automatically with initial data on first run.
+The database will be created and seeded automatically on first run.
+
+## Features
+
+- Create and manage tickets with status and priority levels
+- Assign multiple users to tickets
+- Filter and search tickets
+- Dashboard with ticket statistics
 
 ## Technologies
 
 - ASP.NET Core 9.0 MVC
 - Entity Framework Core
 - SQLite
-- Bootstrap 5
